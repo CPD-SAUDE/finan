@@ -1,0 +1,70 @@
+```typescriptreact file="components/app-header.tsx"
+[v0-no-op-code-block-prefix]"use client"
+
+import Image from "next/image"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+
+const routes = [
+  { href: "/", label: "Dashboard" },
+  { href: "/clientes", label: "Clientes" },
+  { href: "/vendas", label: "Vendas/Orçamentos" },
+  { href: "/recebimentos", label: "Recebimentos" },
+  { href: "/relatorios", label: "Relatórios" },
+  { href: "/configuracoes", label: "Configurações" },
+]
+
+export function AppHeader({ className = "" }: { className?: string }) {
+  const pathname = usePathname()
+  return (
+    <header
+      className={cn(
+        "sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+        className,
+      )}
+    >
+      <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4">
+        <Link href="/" className="flex items-center gap-2">
+          <Image
+            src="/placeholder.svg?height=28&width=28"
+            alt="Logo da empresa"
+            width={28}
+            height={28}
+            className="rounded"
+          />
+          <span className="font-semibold">Meu ERP</span>
+        </Link>
+        <nav className="ml-auto hidden items-center gap-1 md:flex">
+          {routes.map((r) => {
+            const active = pathname === r.href
+            return (
+              <Link key={r.href} href={r.href}>
+                <Button
+                  variant={active ? "default" : "ghost"}
+                  className={cn("text-sm", active ? "" : "text-muted-foreground hover:text-foreground")}
+                >
+                  {r.label}
+                </Button>
+              </Link>
+            )
+          })}
+        </nav>
+        <div className="md:hidden ml-auto">
+          {/* Menu compacto em mobile: apenas links essenciais */}
+          <Link href="/clientes">
+            <Button variant="ghost" className="text-sm">
+              Clientes
+            </Button>
+          </Link>
+          <Link href="/vendas">
+            <Button variant="ghost" className="text-sm">
+              Vendas
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </header>
+  )
+}

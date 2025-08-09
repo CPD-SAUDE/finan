@@ -1,0 +1,265 @@
+// lib/planilha.ts
+export type LinhaVenda = {
+  id: string
+  dataPedido?: string
+  numeroOF?: string
+  numeroDispensa?: string
+  cliente?: string
+  produto?: string
+  modalidade?: string
+  valorVenda?: number
+  taxaCapitalPerc?: number
+  taxaCapitalVl?: number
+  taxaImpostoPerc?: number
+  taxaImpostoVl?: number
+  custoMercadoria?: number
+  somaCustoFinal?: number
+  lucroValor?: number
+  lucroPerc?: number
+  dataRecebimento?: string
+  status?: string
+  cor?: "amarelo" | "vermelho" | "verde" | "roxo" | "cinza"
+  acertoId?: string
+}
+
+export function linhasPendentesDeAcerto(): LinhaVenda[] {
+  return getLinhas().filter(
+    (r) => (r.status || "").toLowerCase().includes("recebido") && !r.acertoId
+  )
+}
+
+export function setLinhasAcerto(ids: string[], acertoId: string) {
+  const all = getLinhas()
+  const set = new Set(ids)
+  const updated = all.map((r) => (set.has(r.id) ? { ...r, acertoId } : r))
+  setLinhas(updated)
+}
+
+// app/vendas/page.tsx
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { TableRow } from "@/components/ui/table"
+import { useState, useEffect } from "react"
+import { LinhaVenda } from "@/lib/planilha"
+import { Field } from "@/components/Field"
+import Link from "next/link"
+import Button from "@/components/Button"
+
+function colorRowClass(cor?: string) {
+  switch (cor) {
+    case "amarelo":
+      return "bg-amber-50 dark:bg-amber-900/20"
+    case "vermelho":
+      return "bg-red-50 dark:bg-red-900/20"
+    case "verde":
+      return "bg-emerald-50 dark:bg-emerald-900/20"
+    case "roxo":
+      return "bg-violet-50 dark:bg-violet-900/20"
+    case "cinza":
+      return "bg-neutral-50 dark:bg-neutral-900/20"
+    default:
+      return ""
+  }
+}
+
+export default function VendasPlanilhaPage() {
+  const [prefs, setPrefs] = useState({ density: "compact" })
+  const [rows, setRows] = useState<LinhaVenda[]>([])
+  const [filteredRows, setFilteredRows] = useState<LinhaVenda[]>([])
+  const [row, setRow] = useState<LinhaVenda | null>(null)
+  const [cor, setCor] = useState<string>("none")
+
+  useEffect(() => {
+    // Simulate fetching data
+    setRows([
+      { id: "1", cliente: "Cliente A", produto: "Produto X", cor: "amarelo" },
+      { id: "2", cliente: "Cliente B", produto: "Produto Y", cor: "vermelho" },
+    ])
+  }, [])
+
+  useEffect(() => {
+    if (row) {
+      setCor(row.cor ?? "none")
+    }
+  }, [row])
+
+  const handleEdit = (row: LinhaVenda) => {
+    setRow(row)
+  }
+
+  const handleSave = () => {
+    if (row) {
+      const payload: Omit<LinhaVenda, "id"> & { id?: string } = {
+        id: row.id,
+        dataPedido: row.dataPedido,
+        numeroOF: row.numeroOF,
+        numeroDispensa: row.numeroDispensa,
+        cliente: row.cliente,
+        produto: row.produto,
+        modalidade: row.modalidade,
+        valorVenda: row.valorVenda,
+        taxaCapitalPerc: row.taxaCapitalPerc,
+        taxaCapitalVl: row.taxaCapitalVl,
+        taxaImpostoPerc: row.taxaImpostoPerc,
+        taxaImpostoVl: row.taxaImpostoVl,
+        custoMercadoria: row.custoMercadoria,
+        somaCustoFinal: row.somaCustoFinal,
+        lucroValor: row.lucroValor,
+        lucroPerc: row.lucroPerc,
+        dataRecebimento: row.dataRecebimento,
+        status: row.status,
+        cor: cor === "none" ? undefined : cor,
+        acertoId: row.acertoId,
+      }
+
+      // Simulate saving data
+      console.log(payload)
+    }
+  }
+
+  return (
+    <div>
+      <table>
+        <tbody>
+          {rows.map((r) => (
+            <TableRow
+              key={r.id}
+              className={`${prefs.density === "compact" ? "h-8" : ""} ${colorRowClass(r.cor)}`}
+            >
+              <td>{r.cliente}</td>
+              <td>{r.produto}</td>
+              <td>{r.cor}</td>
+            </TableRow>
+          ))}
+        </tbody>
+      </table>
+
+      {row && (
+        <div>
+          <Field label="Cor do registro (opcional)">
+            <ToggleGroup
+              type="single"
+              value={cor}
+              onValueChange={(v) => setCor(v || "none")}
+              className="flex gap-2"
+            >
+              <ToggleGroupItem
+                value="none"
+                aria-label="Sem cor"
+                className="h-6 w-6 rounded border data-[state=on]:ring-2"
+              >
+                <span className="sr-only">Sem cor</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="amarelo"
+                aria-label="Amarelo"
+                className="h-6 w-6 rounded bg-amber-300/70 data-[state=on]:ring-2 ring-amber-600"
+              >
+                <span className="sr-only">Amarelo</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="vermelho"
+                aria-label="Vermelho"
+                className="h-6 w-6 rounded bg-red-300/70 data-[state=on]:ring-2 ring-red-600"
+              >
+                <span className="sr-only">Vermelho</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="verde"
+                aria-label="Verde"
+                className="h-6 w-6 rounded bg-emerald-300/70 data-[state=on]:ring-2 ring-emerald-600"
+              >
+                <span className="sr-only">Verde</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="roxo"
+                aria-label="Roxo"
+                className="h-6 w-6 rounded bg-violet-300/70 data-[state=on]:ring-2 ring-violet-600"
+              >
+                <span className="sr-only">Roxo</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="cinza"
+                aria-label="Cinza"
+                className="h-6 w-6 rounded bg-neutral-300/70 data-[state=on]:ring-2 ring-neutral-600"
+              >
+                <span className="sr-only">Cinza</span>
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </Field>
+          <button onClick={handleSave}>Save</button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// components/app-header.tsx
+import Link from "next/link"
+import Button from "./Button"
+
+const routes = [
+  { href: "/", label: "Dashboard" },
+  { href: "/clientes", label: "Clientes" },
+  { href: "/vendas", label: "Vendas/Orçamentos" },
+  { href: "/recebimentos", label: "Recebimentos" },
+  { href: "/acertos", label: "Acertos" },
+  { href: "/relatorios", label: "Relatórios" },
+  { href: "/configuracoes", label: "Configurações" },
+]
+
+export default function AppHeader() {
+  return (
+    <div>
+      <nav>
+        <ul>
+          {routes.map((route) => (
+            <li key={route.href}>
+              <Link href={route.href}>
+                <Button variant="ghost" className="text-sm">
+                  {route.label}
+                </Button>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div className="mobile-links">
+        <Link href="/dashboard">
+          <Button variant="ghost" className="text-sm">
+            Dashboard
+          </Button>
+        </Link>
+        <Link href="/clientes">
+          <Button variant="ghost" className="text-sm">
+            Clientes
+          </Button>
+        </Link>
+        <Link href="/vendas">
+          <Button variant="ghost" className="text-sm">
+            Vendas/Orçamentos
+          </Button>
+        </Link>
+        <Link href="/acertos">
+          <Button variant="ghost" className="text-sm">
+            Acertos
+          </Button>
+        </Link>
+        <Link href="/recebimentos">
+          <Button variant="ghost" className="text-sm">
+            Recebimentos
+          </Button>
+        </Link>
+        <Link href="/relatorios">
+          <Button variant="ghost" className="text-sm">
+            Relatórios
+          </Button>
+        </Link>
+        <Link href="/configuracoes">
+          <Button variant="ghost" className="text-sm">
+            Configurações
+          </Button>
+        </Link>
+      </div>
+    </div>
+  )
+}

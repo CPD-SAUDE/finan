@@ -1,0 +1,4 @@
+- Regra registrada: NÃO usar PDF em nenhuma parte do sistema.
+- Layout do frontend e campos existentes não serão alterados.
+- Etapa 2 migrou apenas o Dashboard para o backend (totais/série e listas). Outras telas ainda usam localStorage até as próximas etapas.
+- Para uso em rede local, ajustar NEXT_PUBLIC_API_URL (frontend) e CORS_ORIGIN (backend) no docker-compose para o IP do servidor.

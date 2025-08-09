@@ -1,0 +1,8 @@
+node_modules
+.next
+dist
+.git
+Dockerfile
+backend/node_modules
+backend/dist
+**/*.log

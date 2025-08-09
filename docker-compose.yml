@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: erp_backend
+    restart: unless-stopped
+    environment:
+      - PORT=4000
+      - DB_PATH=/data/erp.sqlite
+      - CORS_ORIGIN=http://localhost:3000
+      - PASSWORD_SALT=erp_local_salt_v1
+      - ADMIN_DEFAULT_PASSWORD=admin
+      - DISABLE_PDF=true
+    volumes:
+      - db-data:/data
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: .
+    container_name: erp_frontend
+    restart: unless-stopped
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  # Container utilitário para manter o volume da base e permitir inspeção do arquivo SQLite.
+  # O backend é quem abre o arquivo e atende as requisições.
+  db:
+    image: keinos/sqlite3:3.46.0
+    container_name: erp_sqlite
+    command: ["bash", "-lc", "mkdir -p /data && touch /data/erp.sqlite && tail -f /dev/null"]
+    volumes:
+      - db-data:/data
+
+volumes:
+  db-data:

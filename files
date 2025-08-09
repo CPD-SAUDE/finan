@@ -1,0 +1,77 @@
+// app/vendas/page.tsx
+import React from 'react';
+import { DialogContent, Button } from '@components/ui';
+import { EditDialog } from './EditDialog';
+
+const VendasPage = () => {
+  // Other code here
+
+  return (
+    <div>
+      {/* Other code here */}
+      <EditDialog />
+      {/* Other code here */}
+    </div>
+  );
+};
+
+export default VendasPage;
+
+// components/EditDialog.tsx
+import React from 'react';
+import { DialogContent, Button } from '@components/ui';
+
+const EditDialog = ({ row, onOpenChange, onOpenManageModalidades, onOpenManageRates }) => {
+  return (
+    <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto overscroll-contain">
+      <div className="sticky top-0 z-10 grid gap-2 rounded-md border bg-background p-3 md:grid-cols-5">
+        {/* Resumo do cálculo content here */}
+      </div>
+      {/* Other content here */}
+      <div className="sticky bottom-0 z-10 -mx-6 flex flex-wrap items-center gap-2 border-t bg-background/95 px-6 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <Button type="submit">{row ? "Salvar alterações" : "Adicionar"}</Button>
+        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          Cancelar
+        </Button>
+        <div className="ml-auto flex gap-2">
+          <Button type="button" variant="outline" className="bg-transparent" onClick={onOpenManageModalidades}>
+            Cadastrar/editar modalidades
+          </Button>
+          <Button type="button" variant="outline" className="bg-transparent" onClick={onOpenManageRates}>
+            Cadastrar/editar taxas
+          </Button>
+        </div>
+      </div>
+    </DialogContent>
+  );
+};
+
+export default EditDialog;
+
+// components/manage-rates-dialog.tsx
+import React from 'react';
+import { DialogContent } from '@components/ui';
+
+const ManageRatesDialog = () => {
+  return (
+    <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto overscroll-contain">
+      {/* Other content here */}
+    </DialogContent>
+  );
+};
+
+export default ManageRatesDialog;
+
+// components/manage-modalidades-dialog.tsx
+import React from 'react';
+import { DialogContent } from '@components/ui';
+
+const ManageModalidadesDialog = () => {
+  return (
+    <DialogContent className="max-w-xl max-h-[80vh] overflow-y-auto overscroll-contain">
+      {/* Other content here */}
+    </DialogContent>
+  );
+};
+
+export default ManageModalidadesDialog;
